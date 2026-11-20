@@ -229,6 +229,7 @@ fun MainMenuFragmentCompose(
                             if (!isPreview) LauncherPreferences.prefs.edit().putInt("voxium_accent_color", selected).apply()
                         }
                     )
+                    VoxiumHeroCard()
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -295,6 +296,7 @@ fun MainMenuFragmentCompose(
                                         if (!isPreview) LauncherPreferences.prefs.edit().putInt("voxium_accent_color", selected).apply()
                                     }
                                 )
+                                VoxiumHeroCard()
                                 ActionCardsContent(
                                     hideActionButtons = hideActionButtons,
                                     isPortrait = isPortrait,
@@ -426,6 +428,43 @@ private fun VoxiumBrandHeader(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun VoxiumHeroCard() {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp),
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.42f),
+        tonalElevation = 0.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 18.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp)
+        ) {
+            Text(
+                text = "✦  VOXIUM JAVA LAUNCHER",
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 9.sp,
+                letterSpacing = 1.3.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Make every world yours.",
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 22.sp,
+                lineHeight = 27.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Your Minecraft setup, ready when you are.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 11.sp
+            )
         }
     }
 }
