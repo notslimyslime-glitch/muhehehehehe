@@ -10,7 +10,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.border
 import androidx.compose.foundation.background
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -319,7 +318,24 @@ fun MainMenuFragmentCompose(
                                 )
                             }
                         } else {
-                            Spacer(modifier = Modifier.weight(1f))
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .weight(1f)
+                                    .verticalScroll(rememberScrollState())
+                            ) {
+                                VoxiumBrandHeader(
+                                    accentArgb = voxiumAccentArgb,
+                                    onAccentSelected = { selected ->
+                                        voxiumAccentArgb = selected
+                                        if (!isPreview) LauncherPreferences.prefs.edit()
+                                            .putInt("app_theme_color", selected)
+                                            .putBoolean("app_custom_theme", true)
+                                            .apply()
+                                    }
+                                )
+                                VoxiumHeroCard()
+                            }
                         }
 
                         SidebarCardContent(
