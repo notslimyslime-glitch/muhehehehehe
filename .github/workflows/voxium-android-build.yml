@@ -1,0 +1,57 @@
+name: Voxium Android build
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "Hyper_Launcher_v3/**"
+      - "glfw/**"
+      - "mojoexec/**"
+      - "sdl/**"
+      - "horizon-android/**"
+      - "NoBlocklist/**"
+      - "settings.gradle"
+      - "build.gradle.kts"
+      - "gradle.properties"
+      - "gradle/**"
+      - ".github/workflows/voxium-android-build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Compile Voxium APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository and native submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build tools
+        run: |
+          sdkmanager "platform-tools" "platforms;android-37" "build-tools;37.0.0" "ndk;30.0.16248370" "cmake;3.22.1"
+
+      - name: Build full debug APK
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :Hyper_Launcher_v3:assembleFullDebug --no-daemon --stacktrace
+
+      - name: Upload debug APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: voxium-debug-apks
+          path: Hyper_Launcher_v3/build/outputs/apk/full/debug/*.apk
+          if-no-files-found: error
+          retention-days: 7
