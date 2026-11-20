@@ -7,6 +7,10 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.border
+import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -109,6 +113,13 @@ fun MainMenuFragmentCompose(
     var launcherBgPath by remember { mutableStateOf(LauncherPreferences.PREF_LAUNCHER_BACKGROUND_PATH) }
     val hasBackground = launcherBgPath != null
     val backgroundTransparency = if (hasBackground) 0.5f else 1f
+    var voxiumAccentArgb by remember {
+        mutableStateOf(
+            if (isPreview) VoxiumAccentPresets.first()
+            else LauncherPreferences.prefs.getInt("voxium_accent_color", VoxiumAccentPresets.first())
+        )
+    }
+    val voxiumAccent = Color(voxiumAccentArgb)
     var hideActionButtons by remember { mutableStateOf(LauncherPreferences.PREF_HIDE_SIDEBAR) }
 
     var selectedInstance by remember {
@@ -187,6 +198,13 @@ fun MainMenuFragmentCompose(
         label = "headScale"
     )
 
+    MaterialTheme(
+        colorScheme = MaterialTheme.colorScheme.copy(
+            primary = voxiumAccent,
+            secondary = voxiumAccent,
+            tertiary = voxiumAccent
+        )
+    ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = if (hasBackground) Color.Transparent else MaterialTheme.colorScheme.surface.copy(alpha = 0.1f),
@@ -204,6 +222,13 @@ fun MainMenuFragmentCompose(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    VoxiumBrandHeader(
+                        accentArgb = voxiumAccentArgb,
+                        onAccentSelected = { selected ->
+                            voxiumAccentArgb = selected
+                            if (!isPreview) LauncherPreferences.prefs.edit().putInt("voxium_accent_color", selected).apply()
+                        }
+                    )
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -263,6 +288,13 @@ fun MainMenuFragmentCompose(
                                     .verticalScroll(rememberScrollState()),
                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
+                                VoxiumBrandHeader(
+                                    accentArgb = voxiumAccentArgb,
+                                    onAccentSelected = { selected ->
+                                        voxiumAccentArgb = selected
+                                        if (!isPreview) LauncherPreferences.prefs.edit().putInt("voxium_accent_color", selected).apply()
+                                    }
+                                )
                                 ActionCardsContent(
                                     hideActionButtons = hideActionButtons,
                                     isPortrait = isPortrait,
@@ -298,6 +330,99 @@ fun MainMenuFragmentCompose(
                             onEditProfileClick = onEditProfileClick,
                             onPlayClick = onPlayClick
                         )
+                    }
+                }
+            }
+        }
+    }
+    }
+}
+
+private val VoxiumAccentPresets = listOf(
+    0xFF8CE5D2.toInt(),
+    0xFF8BB7FF.toInt(),
+    0xFFB69CFF.toInt(),
+    0xFFFF9FC5.toInt(),
+    0xFFFFC477.toInt(),
+    0xFFA8DF83.toInt()
+)
+
+@Composable
+private fun VoxiumBrandHeader(
+    accentArgb: Int,
+    onAccentSelected: (Int) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                modifier = Modifier.size(42.dp),
+                shape = RoundedCornerShape(14.dp),
+                color = Color(accentArgb).copy(alpha = 0.18f),
+                contentColor = Color(accentArgb)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text("V", fontSize = 25.sp, fontWeight = FontWeight.Black)
+                }
+            }
+            Column(modifier = Modifier.padding(start = 10.dp).weight(1f)) {
+                Text(
+                    text = "Voxium",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = "MADE BY - MAYANK",
+                    fontSize = 9.sp,
+                    letterSpacing = 1.1.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Text(
+                text = "JAVA EDITION",
+                fontSize = 9.sp,
+                letterSpacing = 0.8.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "ACCENT",
+                fontSize = 9.sp,
+                letterSpacing = 1.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            VoxiumAccentPresets.forEach { color ->
+                Box(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .background(Color(color))
+                        .border(
+                            width = if (accentArgb == color) 2.dp else 1.dp,
+                            color = if (accentArgb == color) MaterialTheme.colorScheme.onBackground else Color.White.copy(alpha = 0.35f),
+                            shape = CircleShape
+                        )
+                        .clickable { onAccentSelected(color) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (accentArgb == color) {
+                        Text("✓", color = Color(0xFF15202B), fontSize = 12.sp, fontWeight = FontWeight.Black)
                     }
                 }
             }
