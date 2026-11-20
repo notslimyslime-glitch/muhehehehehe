@@ -116,7 +116,8 @@ fun MainMenuFragmentCompose(
     var voxiumAccentArgb by remember {
         mutableStateOf(
             if (isPreview) VoxiumAccentPresets.first()
-            else LauncherPreferences.prefs.getInt("voxium_accent_color", VoxiumAccentPresets.first())
+            else if (LauncherPreferences.PREF_CUSTOM_THEME) LauncherPreferences.PREF_THEME_COLOR
+            else VoxiumAccentPresets.first()
         )
     }
     val voxiumAccent = Color(voxiumAccentArgb)
@@ -226,7 +227,10 @@ fun MainMenuFragmentCompose(
                         accentArgb = voxiumAccentArgb,
                         onAccentSelected = { selected ->
                             voxiumAccentArgb = selected
-                            if (!isPreview) LauncherPreferences.prefs.edit().putInt("voxium_accent_color", selected).apply()
+                            if (!isPreview) LauncherPreferences.prefs.edit()
+                                .putInt("app_theme_color", selected)
+                                .putBoolean("app_custom_theme", true)
+                                .apply()
                         }
                     )
                     VoxiumHeroCard()
