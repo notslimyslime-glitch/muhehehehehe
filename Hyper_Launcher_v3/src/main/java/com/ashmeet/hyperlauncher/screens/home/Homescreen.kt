@@ -297,7 +297,10 @@ fun MainMenuFragmentCompose(
                                     accentArgb = voxiumAccentArgb,
                                     onAccentSelected = { selected ->
                                         voxiumAccentArgb = selected
-                                        if (!isPreview) LauncherPreferences.prefs.edit().putInt("voxium_accent_color", selected).apply()
+                                        if (!isPreview) LauncherPreferences.prefs.edit()
+                                            .putInt("app_theme_color", selected)
+                                            .putBoolean("app_custom_theme", true)
+                                            .apply()
                                     }
                                 )
                                 VoxiumHeroCard()
